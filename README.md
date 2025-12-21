@@ -1,6 +1,6 @@
 # DeepSeek Paper Trading Bot
 
-This repository contains a paper-trading bot (with optional Hyperliquid mainnet execution) that runs against the Binance REST API while leveraging DeepSeek for trade decision-making. Inspired by the https://nof1.ai/ challenge. A live deployment is available at [trades-trend.com]([(https://trades-trend.com/algotrading-what-is-it)]), where you can access the dashboard and review the complete bot conversation log.
+This repository contains a paper-trading bot (with optional Hyperliquid mainnet execution) that runs against the Binance REST API while leveraging DeepSeek for trade decision-making. Inspired by the https://nof1.ai/ challenge. A live deployment is available at [trades-trend.com](https://trades-trend.com/algotrading-what-is-it), where you can access the dashboard and review the complete bot conversation log.
 
 The app persists its runtime data (portfolio state, AI messages, and trade history) inside a dedicated `data/` directory so it can be mounted as a volume when running in Docker.
 
@@ -242,116 +242,9 @@ Because the backtester drives the same modules as production you can plug the CS
 
 ---
 
-## Development Roadmap & Sponsorship
+## 📧 Contact
 
-This project evolves through community sponsorship. Each **$1,000 tier** unlocks focused capabilities. Development begins once a tier is fully funded (estimated 1-2 weeks per tier). All code remains open-source.
-
-### Current Status
-
-**🔒 Tier 1 is next** - Hyperliquid Live Execution needs funding to begin development.
-
-### 🎯 Tier 1: Hyperliquid Live Execution
-**Goal: $1,000 | Funded: $0**
-
-Core live trading on Hyperliquid mainnet:
-- IOC order execution with retry logic
-- Basic position tracking
-
-### 🛡️ Tier 2: Emergency Controls & Monitoring
-**Goal: $1,000 | Funded: $0**
-
-Safety and transparency:
-- Kill-switch (Telegram command + env variable)
-- Slippage tracking and audit logging
-- Enhanced smoke test suite
-
-### 📊 Tier 3: Smart Position Sizing
-**Goal: $1,000 | Funded: $0**
-
-Dynamic risk-based sizing:
-- Volatility-adjusted position sizing (ATR)
-- Account equity percentage rules
-- Trailing stops implementation
-
-### 🔒 Tier 4: Portfolio Risk Limits
-**Goal: $1,000 | Funded: $0**
-
-Portfolio-level protection:
-- Max total exposure limits
-- Correlation analysis between assets
-- Daily loss limits with auto-pause
-- Risk heat maps in dashboard
-
-### 🤖 Tier 5: Multi-LLM Support
-**Goal: $1,000 | Funded: $0**
-
-Compare AI performance:
-- Add GPT-5 and Claude support
-- Side-by-side LLM comparison
-- Per-model performance tracking
-- Easy model switching
-
-### 🧠 Tier 6: Strategy Voting System
-**Goal: $1,000 | Funded: $0**
-
-Run multiple strategies:
-- Multiple prompt personalities (conservative/aggressive/counter-trend)
-- Weighted voting on decisions
-- Hot-swap strategies without restart
-- Individual strategy P&L tracking
-
-### 📈 Tier 7: Basic Backtesting
-**Goal: $1,000 | Funded: $0**
-
-Test on historical data:
-- Historical OHLCV data pipeline
-- Simple simulation engine
-- Basic performance metrics
-- CSV report generation
-
-### 🔬 Tier 8: Advanced Backtesting
-**Goal: $1,000 | Funded: $0**
-
-Professional validation:
-- Monte Carlo analysis
-- Walk-forward optimization
-- Realistic slippage/commissions
-- Parameter sensitivity testing
-
-### 📊 Tier 9: Performance Analytics
-**Goal: $1,000 | Funded: $0**
-
-Deep insights:
-- ML-based anomaly detection
-- Advanced metrics (VaR, CVaR, rolling Sharpe/Sortino)
-- Profit factor analysis by asset/timeframe
-- Market regime detection
-
-### 🚨 Tier 10: Smart Alerting & Reports
-**Goal: $1,000 | Funded: $0**
-
-Intelligence layer:
-- Context-aware alerting (pattern-based, not just thresholds)
-- Automated weekly performance reports
-- Multi-channel alerts (Email/Telegram/Discord)
-- Custom dashboard exports
-
-### 💰 How to Sponsor
-
-1. **Choose Tier 1** (must fund in order)
-2. **Send $1,000** to: `0x4B1bEd654BA86F64441037ad0A7D2ce54321B381` (Ethereum)
-3. **Create Issue** with transaction ID
-4. **Track Progress** - Development starts once funded
-
-**Sponsor Benefits:**
-- Early access to new features
-- Listed as project sponsor in README
-- Direct input on feature priorities
-- Weekly progress updates
-
-### 📧 Contact
-
-Questions about sponsorship? Reach out via:
+Questions? Reach out via:
 - **Email:** [contact@trades-trend.com]
 - **Telegram:** [@tot_gromov]
 
