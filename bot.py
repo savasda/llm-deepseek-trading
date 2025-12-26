@@ -25,6 +25,8 @@ from dotenv import load_dotenv
 from colorama import Fore, Style, init as colorama_init
 
 from hyperliquid_client import HyperliquidTradingClient
+from exchange_factory import get_exchange_adapter
+from exchange_adapter import ExchangeAdapter
 
 colorama_init(autoreset=True)
 
@@ -368,7 +370,7 @@ if OPENROUTER_API_KEY:
 else:
     logging.error("OPENROUTER_API_KEY not found; please check your .env file.")
 
-client: Optional[Client] = None
+client: Optional[ExchangeAdapter] = None
 
 try:
     hyperliquid_trader = HyperliquidTradingClient(
@@ -380,42 +382,62 @@ except Exception as exc:
     logging.critical("Hyperliquid live trading initialization failed: %s", exc)
     raise SystemExit(1) from exc
 
-def get_binance_client() -> Optional[Client]:
-    """Return a connected Binance client or None if initialization failed."""
+def get_exchange_client() -> Optional[ExchangeAdapter]:
+    """Return the configured exchange client adapter.
+
+    This function replaces get_binance_client() and supports multiple exchanges
+    through the factory pattern. The exchange is selected via the EXCHANGE
+    environment variable.
+
+    Returns:
+        Exchange adapter instance (Binance, Bitget, etc.) or None if initialization failed
+    """
     global client
 
     if client is not None:
         return client
 
-    if not API_KEY or not API_SECRET:
-        logging.error("BN_API_KEY and/or BN_SECRET missing; unable to initialize Binance client.")
-        return None
-
     try:
-        logging.info("Attempting to initialize Binance client...")
-        client = Client(API_KEY, API_SECRET, testnet=False)
-        logging.info("Binance client initialized successfully.")
+        logging.info("Initializing exchange client...")
+        client = get_exchange_adapter()
+        logging.info(f"Exchange client initialized: {client.get_exchange_name()}")
+    except ValueError as exc:
+        logging.error(f"Configuration error: {exc}")
+        client = None
     except Timeout as exc:
         logging.warning(
-            "Timed out while connecting to Binance API: %s. Will retry automatically without exiting.",
+            "Timed out while connecting to exchange API: %s. Will retry automatically without exiting.",
             exc,
         )
         client = None
     except RequestException as exc:
         logging.error(
-            "Network error while connecting to Binance API: %s. Will retry automatically.",
+            "Network error while connecting to exchange API: %s. Will retry automatically.",
             exc,
         )
         client = None
     except Exception as exc:
         logging.error(
-            "Unexpected error while initializing Binance client: %s",
+            "Unexpected error while initializing exchange client: %s",
             exc,
             exc_info=True,
         )
         client = None
 
     return client
+
+
+def get_binance_client() -> Optional[ExchangeAdapter]:
+    """Legacy function for backward compatibility.
+
+    DEPRECATED: Use get_exchange_client() instead.
+    This function now returns an exchange adapter (Binance or other)
+    instead of a raw Binance Client.
+
+    Returns:
+        Exchange adapter instance or None
+    """
+    return get_exchange_client()
 
 # ──────────────────────── GLOBAL STATE ─────────────────────
 balance: float = START_CAPITAL
@@ -933,7 +955,7 @@ def fetch_market_data(symbol: str) -> Optional[Dict[str, Any]]:
 
         # Get funding rate for perpetual futures
         try:
-            funding_info = binance_client.futures_funding_rate(symbol=symbol, limit=1)
+            funding_info = binance_client.get_funding_rate(symbol=symbol, limit=1)
             funding_rate = float(funding_info[0]["fundingRate"]) if funding_info else 0
         except:
             funding_rate = 0
@@ -1075,14 +1097,14 @@ def collect_prompt_market_data(symbol: str) -> Optional[Dict[str, Any]]:
         df_trend["atr"] = calculate_atr_series(df_trend, 14)
 
         try:
-            oi_hist = binance_client.futures_open_interest_hist(symbol=symbol, period="5m", limit=30)
+            oi_hist = binance_client.get_open_interest(symbol=symbol, interval="5m", limit=30)
             open_interest_values = [float(entry["sumOpenInterest"]) for entry in oi_hist]
         except Exception as exc:
             logging.debug("Open interest history unavailable for %s: %s", symbol, exc)
             open_interest_values = []
 
         try:
-            funding_hist = binance_client.futures_funding_rate(symbol=symbol, limit=30)
+            funding_hist = binance_client.get_funding_rate(symbol=symbol, limit=30)
             funding_rates = [float(entry["fundingRate"]) for entry in funding_hist]
         except Exception as exc:
             logging.debug("Funding rate history unavailable for %s: %s", symbol, exc)

@@ -172,6 +172,42 @@ The top-level metrics include Sharpe and Sortino ratios alongside balance, equit
 
 ---
 
+## Railway Cloud Deployment
+
+Deploy to [Railway](https://railway.com) for a production-ready cloud setup with automatic deployments, persistent storage, and HTTPS:
+
+### Quick Deploy
+
+1. **Fork/Clone this repository** to your GitHub account
+2. **Sign up at [Railway](https://railway.com)** (free $5/month credit)
+3. **Create New Project** → Deploy from GitHub repo
+4. **Add environment variables** via Railway dashboard (see [.env.example](.env.example))
+5. **Create a volume** at `/app/data` for persistent data storage
+6. **Access your live dashboard** at the Railway-provided URL
+
+The deployment runs **both the trading bot and dashboard in a single service**, with the dashboard serving as the health check endpoint and displaying real-time trading data.
+
+### Detailed Guide
+
+See [RAILWAY.md](RAILWAY.md) for complete deployment instructions including:
+- Step-by-step setup and configuration
+- Environment variable management
+- Volume configuration for data persistence
+- Custom domain setup
+- Monitoring and troubleshooting
+- Cost optimization tips
+
+### Architecture
+
+Railway deployment uses a **single service** that runs:
+- **Trading Bot**: Background process executing trades every 15 minutes
+- **Streamlit Dashboard**: Live web interface (publicly accessible with HTTPS)
+- **Shared Data**: Both processes read/write to `/app/data` for real-time updates
+
+The service automatically redeploys when you push to GitHub, ensuring zero-downtime updates.
+
+---
+
 ## Reconcile Portfolio State After Editing Trades
 
 If you manually edit `data/trade_history.csv` (for example, deleting erroneous trades) run the reconciliation helper to rebuild `portfolio_state.json` from the remaining rows:

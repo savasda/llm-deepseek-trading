@@ -9,9 +9,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     TRADEBOT_DATA_DIR=/app/data
 
-# Prepare data directory for volume mounting
+# Prepare data directory (volumes are configured in Railway, not in Dockerfile)
 RUN mkdir -p /app/data
-VOLUME ["/app/data"]
 
 # Install system dependencies (optional, only if needed for compilation)
 RUN apt-get update && apt-get install -y \
@@ -31,5 +30,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy your application code
 COPY . .
 
-# Run your application
-CMD ["python", "bot.py"]
+# Make startup script executable
+RUN chmod +x start.sh
+
+# Run both bot and dashboard via startup script
+CMD ["./start.sh"]

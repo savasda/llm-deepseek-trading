@@ -21,6 +21,8 @@ import numpy as np
 import pandas as pd
 from binance.client import Client
 from dotenv import load_dotenv
+from exchange_factory import get_exchange_adapter
+from exchange_adapter import ExchangeAdapter
 
 # Columns returned by Binance kline endpoints
 KLINE_COLUMNS: List[str] = [
@@ -261,7 +263,7 @@ class BacktestConfig:
 
 
 def ensure_cached_klines(
-    client: Client,
+    client: ExchangeAdapter,
     cfg: BacktestConfig,
     symbol: str,
     interval: str,
@@ -478,16 +480,16 @@ def main() -> None:
         logging.warning("Hyperliquid trader reports live mode; forcing paper mode for backtest.")
         bot.hyperliquid_trader._requested_live = False  # type: ignore[attr-defined]
 
-    api_key = os.getenv("BN_API_KEY") or None
-    api_secret = os.getenv("BN_SECRET") or None
-    binance_client = Client(api_key, api_secret, testnet=False)
+    # Get exchange adapter for downloading historical data
+    exchange_client = get_exchange_adapter()
+    logging.info(f"Using {exchange_client.get_exchange_name()} for historical data download")
 
     intervals_needed = {cfg.interval, STRUCTURE_INTERVAL, LONG_CONTEXT_INTERVAL}
     symbol_frames: Dict[str, Dict[str, pd.DataFrame]] = {}
     for symbol in bot.SYMBOLS:
         symbol_frames[symbol] = {}
         for interval in intervals_needed:
-            frame = ensure_cached_klines(binance_client, cfg, symbol, interval)
+            frame = ensure_cached_klines(exchange_client, cfg, symbol, interval)
             symbol_frames[symbol][interval] = frame
 
     historical_client = HistoricalBinanceClient(symbol_frames)
